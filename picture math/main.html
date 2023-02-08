@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="style.css">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&family=Teko:wght@500&display=swap" rel="stylesheet">
+
+        <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    </head>
+
+    <body onload="onload()">
+        <!-- ======= Hero Section ======= -->
+        <section id="hero" class="d-flex justify-content-center align-items-center">
+            <div class="container position-relative" data-aos="zoom-in" data-aos-delay="100">
+              <h1>Colorful Math,<br>Colorful Learning</h1>
+              <h2>Helping kids learn math one colorful custom worksheet at a time.</h2>
+              <a href="main.html#picture" class="btn-get-started">Get Started</a>
+            </div>
+          </section>
+        <!-- End Hero -->
+
+
+        <!-- ======= Prepare the Picture ======= -->
+        <section id="picture">
+            <div class="container">
+                <h1 class="section-title">Prepare Your Picture</h1>
+
+                <p>
+                    Prepare the picture that will be colored in the worksheet.
+                    You can design it from scratch or start by uploading an image.
+                </p>
+
+                <div class="row">
+                    <div class="col-3">
+                        <label class="form-label" for="uploadImageInput">Upload an image</label>
+                        <input type="file" class="form-control" id="uploadImageInput" accept='.png,.jpg,.jpeg' onchange="beginUploadImage(event)"/>
+                    </div>
+                </div>
+
+                <div class="row m-up">
+                    <div class="col-12 col-lg-6 order-0 order-lg-1">
+                        <div id='image-grid-border'>
+                            <div id='image-grid'></div>
+                        </div>
+                    </div>
+
+                    <div class="col order-2 order-lg-0">
+                        <h2>Dimensions&nbsp;</h2>
+                
+                        <p style='display: inline-block;'>
+                            Width  <input type='number' id='columns' name='columns' min='2' max='32' value='4' onchange='setGridColumns()' class="form-control">
+                        </p>
+
+                        <p style='display: inline-block;'>
+                            Height <input type='number' id='rows' name='rows' min='2' max='32' value='4' onchange='setGridRows()' class="form-control">
+                        </p>
+                    </div>
+    
+                    <div class="col order-1 order-lg-2">
+                        <label class="color-label"><input type='color' id='color-picker' onchange='setColor()'></label>
+    
+                        <input type='text' id='color-name' name='color-name' class="form-control" onchange='setColorName()'>
+    
+                        <div id='color-grid'></div>
+                        <button class="btn btn-dark" onclick='removeColor()'>Remove</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ======= Upload Image ======= -->
+        <div class="modal fade" id="crop-modal" tabindex="-1" role="dialog" aria-labelledby="crop-modal-label"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="min-width:90%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="crop-modal-label">Crop the image</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div id='img-upload-crop'>
+                                        <img id='img-upload-crop-cropped-out' draggable="false">
+
+                                        <div id='img-upload-crop-included-container'>
+                                            <img id='img-upload-crop-included' draggable="false">
+                                
+                                            <span class="cropper-dashed dashed-h"></span>
+                                            <span class="cropper-dashed dashed-v"></span>
+                                
+                                            <span id="cropper-line-n" class="cropper-line line-n"></span>
+                                            <span id="cropper-line-e" class="cropper-line line-e"></span>
+                                            <span id="cropper-line-s" class="cropper-line line-s"></span>
+                                            <span id="cropper-line-w" class="cropper-line line-w"></span>
+                                        </div>
+                        </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button id="cropper-continue" type="button" class="btn btn-primary">Continue</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="import-modal" tabindex="-1" role="dialog" aria-labelledby="import-modal-label"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="min-width:90%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="import-modal-label">Align the grid</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div id='img-import-canvases'>
+                                        <canvas id='image-import-set-display' width="100" height="100" 
+                                        onmousedown="importImageDisplayMouseDown(event)" onmouseup="importImageDisplayMouseUp(event)" onmouseleave="importImageDisplayMouseLeave()" onwheel="importImageDisplayMouseWheel(event)"></canvas>
+                                        <canvas id='image-import-set-grid' width="100" height="100"></canvas>
+                                    </div>    
+                                </div>
+                              
+                                <div class="col-4">
+                                    <label class="form-label" for="import-image-zoom">Zoom</label>
+                                    <input type="number" id='import-image-zoom' value="1" name='import-image-zoom' class="form-control" onchange="importImageSetZoom()">
+                                    
+                                    <br>
+                                    <label class="form-label" for="import-image-zoom">X-Position</label>
+                                    <input type="number" id='import-image-xpos' value="0" name='import-image-xpos' class="form-control" onchange="importImageSetPos()">
+                                    
+                                    <br>
+                                    <label class="form-label" for="import-image-zoom">Y-Position</label>
+                                    <input type="number" id='import-image-ypos' value="0" name='import-image-ypos' class="form-control" onchange="importImageSetPos()">
+
+                                    <br><br>
+                                    <label class="form-label" for="import-image-zoom">Grid X-Offset</label>
+                                    <input type="number" id='import-image-gridx' value="0" name='import-image-gridx' class="form-control" onchange="importImageSetGridOffset()">
+                                    
+                                    <br>
+                                    <label class="form-label" for="import-image-zoom">Grid Y-Offset</label>
+                                    <input type="number" id='import-image-gridy' value="0" name='import-image-gridy' class="form-control" onchange="importImageSetGridOffset()">
+                                    
+                                    <br>
+                                    <label class="form-label" for="import-image-zoom">Grid Cell Size</label>
+                                    <input type="number" id='import-image-cellSize' value="" name='import-image-cellSize' class="form-control" onchange="importImageSetGridCellSize()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button id="import-continue" type="button" class="btn btn-primary">Continue</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="import-final-modal" tabindex="-1" role="dialog" aria-labelledby="import-final-modal-label"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="min-width:90%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="import-final-modal-label">Finish Import</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div id='img-import-grid'></div>  
+                                </div>
+                              
+                                <div class="col-4">
+                                    <div id='img-import-color-grid' style="display: grid; width: 100%;"></div>
+
+                                    <div style="float: left; display: none; margin-top: 20px;" id='import-color-select' class="no-bubbling">
+                                        <input type='color' id='import-color-picker' style='width: 100px; height: 100px;'>
+                                        <button id='import-begin-combine'>Combine with other colors</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button id="import-final-continue" type="button" class="btn btn-primary">Finish</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ======= End Section ======= -->
+
+
+        <!-- ======= Set the Questions ======= -->
+        <section id="questions">
+            <div class="container">
+                <h1 class="section-title">Set the Questions</h1>
+
+                <label class="form-label" for="set-question-count">Question Count</label>
+                <input type="number" id='set-question-count' value="15" name='set-question-count' style="margin-bottom: 40px;" class="form-control" onchange="setQuestionCount(event)">
+
+                <p>
+                    Choose the types of questions you would like to appear on the worksheet. <br>
+                    <em>If you do not select any options, the worksheet will be generated without questions and only answers.</em>
+                </p>
+                <div class="row">
+                    <div class="col-lg-6 col-md-12 icon-box"> 
+                        <button id="addition-toggle-button" type="button" class="btn btn-block icon-box collapsible" onclick="toggleQuestion(event, 0)">
+                            <h3>+ Addition</h3>
+                        </button>
+
+                        <div class="content">
+                            <p>Add numbers</p>
+                            <p style='display: inline-block;'>
+                                from  <input type='number' id='number-range-from-addition' name='number-range-from-addition' min='-999' max='999' value='1' onchange='setAdditionParams()' class="form-control">
+                            </p>
+
+                            <p style='display: inline-block;'>
+                                to <input type='number' id='number-range-to-addition' name='number-range-to-addition' min='-999' max='999' value='25' onchange='setAdditionParams()' class="form-control">
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6 col-md-12 icon-box">
+                        <button id="subtraction-toggle-button" type="button" class="btn btn-block icon-box collapsible" onclick="toggleQuestion(event, 1)">
+                            <h3>- Subtraction</h3>
+                        </button>
+
+                        <div class="content">
+                            <p>Subtract numbers</p>
+                            <p style='display: inline-block;'>
+                                from  <input type='number' id='number-range-from-subtraction' name='number-range-from' min='-999' max='999' value='1' onchange='setSubtractionParams()' class="form-control">
+                            </p>
+
+                            <p style='display: inline-block;'>
+                                to <input type='number' id='number-range-to-subtraction' name='number-range-to' min='-999' max='999' value='25' onchange='setSubtractionParams()' class="form-control">
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-12 icon-box">
+                        <button id="multiplication-toggle-button" type="button" class="btn btn-block icon-box collapsible" onclick="toggleQuestion(event, 2)">
+                            <h3>× Multiplication</h3>
+                        </button>
+
+                        <div class="content">
+                            <p>Multiply numbers</p>
+                            <p style='display: inline-block;'>
+                                from  <input type='number' id='number-range-from-multiplication' name='number-range-from' min='-999' max='999' value='1' onchange='setMultiplicationParams()' class="form-control">
+                            </p>
+
+                            <p style='display: inline-block;'>
+                                to <input type='number' id='number-range-to-multiplication' name='number-range-to' min='-999' max='999' value='25' onchange='setMultiplicationParams()' class="form-control">
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-12 icon-box">
+                        <button id="division-toggle-button" type="button" class="btn btn-block icon-box collapsible" onclick="toggleQuestion(event, 3)">
+                            <h3>÷ Division</h3>
+                        </button>
+
+                        <div class="content">
+                            <p>Divide numbers</p>
+                            <p style='display: inline-block;'>
+                                from  <input type='number' id='number-range-from-division' name='number-range-from' min='-999' max='999' value='1' onchange='setDivisionParams()' class="form-control">
+                            </p>
+
+                            <p style='display: inline-block;'>
+                                to <input type='number' id='number-range-to-division' name='number-range-to' min='-999' max='999' value='25' onchange='setDivisionParams()' class="form-control">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ======= End Section ======= -->
+
+
+        <!-- ======= Get the Worksheet ======= -->
+        <section id="worksheet">
+            <div class="container">
+                <h1 class="section-title">Get your Worksheet</h1>
+                <p>Generate, copy and print your worksheet!</p>
+
+                <div class="modal fade" id="generate-final-modal" tabindex="-1" role="dialog" aria-labelledby="generate-final-modal-label"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="width:70%; max-width: 1000px;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="generate-final-modal-label">Worksheet Settings</h5>
+                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="generate-color-name-block">
+                                                <div class="generate-color-name-indicator"></div>
+                                                <div class="generate-color-name-input">
+                                                    <p>Color Name:</p>
+                                                    <input type='text' class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button id="generate-continue" type="button" class="btn btn-primary">Continue</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="generate-final-settings-modal" tabindex="-1" role="dialog" aria-labelledby="generate-final-settings-modal-label"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="width:70%; max-width: 1000px;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="generate-final-settings-modal-label">Worksheet Settings</h5>
+                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <h3>Coloring Grid</h3>
+                                        <p>
+                                            <span style="font-weight: bold">Coloring grid generation mode</span>
+                                            <span style="font-style: italic">
+                                                <br>"Grid" will fill each cell of the grid with a number that must be colored individually.
+                                                <br>"Blocks" will group some same-colored cells together into small blocks.
+                                                <br>"Fully Grouped" will group all same-colored cells that are touching together.
+                                                <br>"Custom" lets you choose the exact size of the grouped blocks.
+                                            </span>
+                                        </p>
+                                        <select class="form-select" aria-label="Select grid type" onchange="setGridGenerationMode(event)">
+                                            <option value="1">Grid</option>
+                                            <option selected value="2">Blocks</option>
+                                            <option value="3">Fully Grouped</option>
+                                            <option value="4">Custom</option>
+                                        </select>
+                                        <p id="generation-block-size-input" class="collapse" style="margin-top: 1rem">
+                                            <span style="font-weight: bold">Block Size</span>
+                                            <input type='number' id='generate-grid-blocksize' name='image-size' class="form-control" min='2' max='99' value='3' onchange="setGridGenerationBlockSize(event)">
+                                        </p>
+
+
+                                        <h3 style="margin-top: 2rem">Worksheet</h3>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="toggle-color-swatches-checkbox" checked onchange="toggleDrawSwatches(event)">
+                                            <label class="form-check-label" for="toggle-color-swatches-checkbox">
+                                                Include color swatches?
+                                            </label>
+                                          </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button id="generate-finish" type="button" class="btn btn-primary">Finish</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generate -->
+                <div>
+                    <button type="button" class="btn btn-warning btn-lg" onclick='generate()'>Generate</button>
+                </div>
+        
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <canvas id='generate-grid-canvas' width='500' height='500'></canvas>
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                        <canvas id='generate-question-canvas' width='500' height='500'></canvas>
+                    </div>
+                </div>
+                
+        
+
+            </div>
+        </section>
+        <!-- ======= End Section ======= -->
+
+        <script type='text/javascript' src='behavior.js'></script>
+    </body>
+</html>
